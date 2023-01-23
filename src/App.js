@@ -17,20 +17,29 @@ import "./App.css";
 import rootReducer from './reducers';
 import rootSaga from './sagas';
 
+// Create a Saga middleware
 const sagaMiddleware = createSagaMiddleware();
+
+// Create a redux store and apply the saga middleware
 const store = createStore(rootReducer, applyMiddleware(sagaMiddleware));
+
+// Run the rootSaga
 sagaMiddleware.run(rootSaga);
 
+// ErrorBoundary component to catch any errors that occur during the app's lifecycle
 class ErrorBoundary extends React.Component {
     constructor(props) {
         super(props);
         this.state = { hasError: false };
     }
 
+
+    // Update the state if an error occurs
     static getDerivedStateFromError(error) {
         return { hasError: true };
     }
 
+     // Log the error and errorInfo
     componentDidCatch(error, errorInfo) {
         console.log(error, errorInfo);
     }
@@ -42,14 +51,20 @@ class ErrorBoundary extends React.Component {
         return this.props.children;
     }
 }
+
+    // The main app component
   class App extends React.Component {
         render() {
             return (
+                 // Wrapping the app in a Provider with the store
                 <Provider store={store}>
                     <ErrorBoundary>
+                          // Wrapping the app in a BrowserRouter
                         <BrowserRouter>
                             <div className="App">
                                 <Header logo={require('./assets/swan-logo.svg')} />
+                                     // Using React Router's Routes and Route 
+                                     //components to handle client-side routing
                                 <Routes>
                                     <Route path="/" element={<HomePage />} />
                                     <Route path="videos" element={<VideoPage />} />
