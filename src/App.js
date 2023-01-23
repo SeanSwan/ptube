@@ -1,5 +1,8 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { Provider } from 'react-redux';
+import { createStore, applyMiddleware } from 'redux';
+import createSagaMiddleware from 'redux-saga';
 import Header from "./components/header/header.component";
 import HomePage from "./pages/homepage/homepage.component";
 import AboutPage from "./pages/about/about-page.component";
@@ -11,6 +14,12 @@ import packageData from "./components/packages/packageData.js";
 import ShopPage from "./components/shop/shop.component.jsx";
 import PackagesPage from "./pages/packages/packages-page.component";
 import "./App.css";
+import rootReducer from './reducers';
+import rootSaga from './sagas';
+
+const sagaMiddleware = createSagaMiddleware();
+const store = createStore(rootReducer, applyMiddleware(sagaMiddleware));
+sagaMiddleware.run(rootSaga);
 
 class ErrorBoundary extends React.Component {
     constructor(props) {
@@ -25,7 +34,7 @@ class ErrorBoundary extends React.Component {
     componentDidCatch(error, errorInfo) {
         console.log(error, errorInfo);
     }
-
+    
     render() {
         if (this.state.hasError) {
             return <h1>Something went wrong.</h1>;
@@ -33,31 +42,33 @@ class ErrorBoundary extends React.Component {
         return this.props.children;
     }
 }
-
-class App extends React.Component {
-    render() {
-        return (
-            <ErrorBoundary>
-                <BrowserRouter>
-                    <div className="App">
-                     <Header logo={require('./assets/swan-logo.svg')} />
-                        <Routes>
-                            <Route path="/" element={<HomePage />} />
-                            <Route path="videos" element={<VideoPage />} />
-                            <Route path="about" element={<AboutPage />} />
-                            <Route path="shop" element={<ShopPage packageData={packageData} />} />
-                            <Route path="contact" element={<ContactPage />} />
-                            <Route path="signup" element={<SignupPage />} />
-                            <Route path="login" element={<LoginPage />} />
-                        </Routes>
-                    </div>
-                </BrowserRouter>
-            </ErrorBoundary>
-        );
+  class App extends React.Component {
+        render() {
+            return (
+                <Provider store={store}>
+                    <ErrorBoundary>
+                        <BrowserRouter>
+                            <div className="App">
+                                <Header logo={require('./assets/swan-logo.svg')} />
+                                <Routes>
+                                    <Route path="/" element={<HomePage />} />
+                                    <Route path="videos" element={<VideoPage />} />
+                                    <Route path="about" element={<AboutPage />} />
+                                    <Route path="shop" element={<ShopPage packageData={packageData} />} />
+                                    <Route path="packages" element={<PackagesPage packageData={packageData} />} />
+                                    <Route path="contact" element={<ContactPage />} />
+                                    <Route path="signup" element={<SignupPage />} />
+                                    <Route path="login" element={<LoginPage />} />
+                                </Routes>
+                            </div>
+                       </BrowserRouter>
+                    </ErrorBoundary>
+                </Provider>
+            );
+        }
     }
-}
 
-export default App; 
+export default App;
 
 // To create a store for your React.js app, you can use a library such as Redux or MobX. Both libraries are popular choices for managing application state in React.js and have their own set of best practices.
 
